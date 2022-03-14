@@ -60,9 +60,8 @@ public class RandDataGen {
                 break;
             }
             ConstrainedGraph g = genGraph(type, size);
-            rep+=("\nGraph "+j+" generated");
             System.out.println("Graph "+j+" generated");
-            rep+=("\n"+Arrays.stream(ArrayUtils.flatten(g.edges)).sum() + " edges");
+            rep+=("\n"+((Arrays.stream(ArrayUtils.flatten(g.edges)).sum())/2) + " edges");
 
             GraphGenerator.genBaseReachability(g);
             /*
@@ -136,13 +135,13 @@ public class RandDataGen {
                 if (measures.getTimeCount() > timelimit) {
                     unoptimal += 1;
                     unoptimalTTB += measures.getTimeToBestSolution();
-                    rep+=("\nGraph " + j + " stopped at " + measures.getTimeCount() + measures.getReadingTimeCount());
+                    //rep+=("\nGraph " + j + " stopped at " + measures.getTimeCount() + measures.getReadingTimeCount());
                 } else {
                     optimal += 1;
                     resTime += measures.getTimeCount();
                     buildTime += measures.getReadingTimeCount();
                     bestTime += measures.getTimeToBestSolution();
-                    rep+=("\nGraph " + j + " solved in " + measures.getTimeCount() + measures.getReadingTimeCount()+"\n");
+                    //rep+=("\nGraph " + j + " solved in " + measures.getTimeCount() + measures.getReadingTimeCount()+"\n");
                     System.out.println("Graph " + j + " solved in " + measures.getTimeCount() + measures.getReadingTimeCount()+"\n");
                 }
             }
