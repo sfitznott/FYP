@@ -38,6 +38,10 @@ public class ConstrainedGraph {
         edges[i][j] = 1;
     }
 
+    public void addBiEdge(int i, int j){
+        addEdge(i,j);
+        addEdge(j,i);
+    }
     // Remove edges
     public void removeEdge(int i, int j) {
         edges[i][j] = 0;
@@ -136,14 +140,23 @@ public class ConstrainedGraph {
     public String toString() {
         StringBuilder s = new StringBuilder("  ");
         for (int i = 0; i < numVertices; i++) {
-            s.append(" " + i);
+            if (i > 9) {
+                s.append(" " + i);
+            } else {
+                s.append("  " + i);
+            }
 
         }
         s.append("\n");
         for (int i = 0; i < numVertices; i++) {
-            s.append(i + ": ");
+            if (i > 9) {
+                s.append(i + ": ");
+            } else {
+                s.append(i + ":  ");
+            }
+
             for (int j : edges[i]) {
-                s.append(j + " ");
+                s.append(j + "  ");
             }
             s.append("\n");
         }
@@ -196,7 +209,7 @@ public class ConstrainedGraph {
 
     public static void main(String[] args) {
         Random r = new Random();
-        int size = 4;
+        int size = 10;
         int edgeRatio = 2;
         ConstrainedGraph g = new ConstrainedGraph(size, 1);
 

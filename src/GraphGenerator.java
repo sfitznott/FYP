@@ -2,12 +2,15 @@ import java.util.Random;
 
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.util.tools.ArrayUtils;
 import org.graphstream.algorithm.generator.BarabasiAlbertGenerator;
 import org.graphstream.algorithm.generator.DorogovtsevMendesGenerator;
 import org.graphstream.algorithm.generator.Generator;
 import org.graphstream.algorithm.generator.WattsStrogatzGenerator;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
+
+import static org.chocosolver.solver.search.strategy.Search.activityBasedSearch;
 
 public class GraphGenerator {
     public static int type = 1;
@@ -49,9 +52,7 @@ public class GraphGenerator {
     */
     public static ConstrainedGraph preferential(int size, int maxLinksPerStep) {
         Graph graph = new SingleGraph("Barabàsi-Albert");
-        // Between 1 and 3 new links per node added.
         Generator gen = new BarabasiAlbertGenerator(maxLinksPerStep);
-        // Generate nodes:
         gen.addSink(graph);
         gen.begin();
         for (int i=0; i<size-2; i++) {
@@ -107,6 +108,7 @@ public class GraphGenerator {
 
     public static void genBaseReachability(ConstrainedGraph g) {
         Solver solver = g.model.getSolver();
+        solver.setSearch(activityBasedSearch(ArrayUtils.flatten(g.open)));
         g.model.setObjective(Model.MAXIMIZE, g.tcSum);
         while (solver.solve()) {
             for(int i = 0; i< g.numVertices; i++) {
@@ -131,7 +133,7 @@ public class GraphGenerator {
                 g.concreteTC[i][j]=0;
                 g.model.arithm(g.tc[i][j], "=", 0).post();
                 neg-=1;
-                //System.out.println(" neg: " + i + " -> " + j);
+                System.out.println(" neg: " + i + " -> " + j);
             }
         }
 
@@ -139,11 +141,27 @@ public class GraphGenerator {
             int i = r.nextInt(size);
             int j = r.nextInt(size);
             if (g.concreteTC[i][j] == 1) {
+                g.concreteTC[i][j]=0;
                 g.model.arithm(g.tc[i][j], "=", 1).post();
                 pos-=1;
-                //System.out.println(" pos: " + i + " -> " + j);
+                System.out.println(" pos: " + i + " -> " + j);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        ConstrainedGraph g = preferential(30, 5);
+
+        genBaseReachability(g);
+        genReachability(g, 1, 1);
+        Solver solver = g.model.getSolver();
+        solver.setSearch(activityBasedSearch(ArrayUtils.flatten(g.open)));
+        //solver.limitTime(180);
+        while (solver.solve()){
+            g.printAll();
+        }
+        solver.printStatistics();
+
     }
 
 }
